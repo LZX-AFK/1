@@ -1,0 +1,23 @@
+{
+  "name": "oleap-fastify-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fastify backend starter for the Oleap uni-app classroom demo.",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "ip": "node scripts/lan-ip.js",
+    "check": "node scripts/check.js"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/multipart": "^10.0.0",
+    "@fastify/static": "^9.1.3",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.8.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

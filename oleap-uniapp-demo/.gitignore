@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.hbuilderx/
+.idea/
+.DS_Store
+*.local
+unpackage/cache/
+unpackage/dist/
+unpackage/uts-error/

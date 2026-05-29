@@ -1,0 +1,7 @@
+{
+  "minSdkVersion": 24,
+  "abiFilters": [
+    "arm64-v8a"
+  ],
+  "note": "Android BLE, control protocol, realtime recording OPUS capture and WAV/MP3 finalize are implemented. Decoder AAR requires minSdkVersion 24."
+}
