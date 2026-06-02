@@ -1,0 +1,76 @@
+{
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue"
+    }
+  },
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "ClassNote AI"
+      }
+    },
+    {
+      "path": "pages/my-courses/my-courses",
+      "style": {
+        "navigationBarTitleText": "我的课程"
+      }
+    },
+    {
+      "path": "pages/prepare-recording/prepare-recording",
+      "style": {
+        "navigationBarTitleText": "准备录音",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/live-transcription/live-transcription",
+      "style": {
+        "navigationBarTitleText": "实时转写",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/ai-summary/ai-summary",
+      "style": {
+        "navigationBarTitleText": "AI 课堂总结"
+      }
+    },
+    {
+      "path": "pages/timeline-markers/timeline-markers",
+      "style": {
+        "navigationBarTitleText": "时间轴标记"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "ClassNote AI",
+    "navigationBarBackgroundColor": "#1A1A2E",
+    "backgroundColor": "#0F0F1A",
+    "backgroundColorTop": "#1A1A2E",
+    "backgroundColorBottom": "#0F0F1A"
+  },
+  "tabBar": {
+    "color": "#8E8E93",
+    "selectedColor": "#6C63FF",
+    "backgroundColor": "#1A1A2E",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/my-courses/my-courses",
+        "iconPath": "static/tabbar/courses.png",
+        "selectedIconPath": "static/tabbar/courses-active.png",
+        "text": "课程"
+      }
+    ]
+  }
+}
