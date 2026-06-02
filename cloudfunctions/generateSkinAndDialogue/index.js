@@ -12,7 +12,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 // ========== 配置（从环境变量读取） ==========
 const DOUBAO_API_KEY     = process.env.DOUBAO_API_KEY     || ''
 const DOUBAO_IMG_MODEL   = process.env.DOUBAO_IMG_MODEL   || 'doubao-seedream-3-0-t2i-250415'  // 豆包文生图模型
-const DOUBAO_TEXT_MODEL  = process.env.DOUBAO_TEXT_MODEL  || 'doubao-pro-32k-250115'             // 豆包文本模型
+const DOUBAO_TEXT_MODEL  = process.env.DOUBAO_TEXT_MODEL  || 'deepseek-v4-flash-260425'    // 文本模型（DeepSeek）
 
 // 火山方舟 API 地址
 const ARK_IMG_ENDPOINT  = 'ark.cn-beijing.volces.com'

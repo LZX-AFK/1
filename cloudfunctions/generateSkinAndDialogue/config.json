@@ -5,6 +5,6 @@
   "env": {
     "DOUBAO_API_KEY": "",
     "DOUBAO_IMG_MODEL": "doubao-seedream-3-0-t2i-250415",
-    "DOUBAO_TEXT_MODEL": "doubao-pro-32k-250115"
+    "DOUBAO_TEXT_MODEL": "deepseek-v4-flash-260425"
   }
 }
