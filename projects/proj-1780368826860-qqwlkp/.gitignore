@@ -1,0 +1,29 @@
+# ClassNote AI — uni-app 项目
+
+# 依赖
+node_modules/
+
+# 编译产物
+unpackage/
+dist/
+
+# IDE
+.idea/
+.vscode/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 日志
+*.log
+npm-debug.log*
+
+# 临时文件
+*.tmp
+tmp/

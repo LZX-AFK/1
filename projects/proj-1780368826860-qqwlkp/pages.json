@@ -41,7 +41,8 @@
     {
       "path": "pages/timeline-markers/timeline-markers",
       "style": {
-        "navigationBarTitleText": "时间轴标记"
+        "navigationBarTitleText": "时间轴标记",
+        "navigationStyle": "custom"
       }
     }
   ],
