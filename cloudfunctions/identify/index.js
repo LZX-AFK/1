@@ -60,21 +60,22 @@ function httpGet(urlPath, params = {}) {
 }
 
 /**
- * HTTP(S) POST 请求封装
+ * HTTP(S) POST form-urlencoded（百度 API 专用）
  */
-function httpPost(hostname, path, body, headers = {}) {
+function httpPostForm(hostname, path, params) {
   return new Promise((resolve, reject) => {
-    const data = typeof body === 'string' ? body : JSON.stringify(body)
-    const defaultHeaders = {
-      'Content-Type': 'application/json',
-      'Content-Length': Buffer.byteLength(data),
-    }
+    const data = Object.keys(params)
+      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+      .join('&')
     const req = https.request({
       hostname,
       path,
       method:  'POST',
       timeout: 30000,
-      headers: { ...defaultHeaders, ...headers },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(data),
+      },
     }, res => {
       let raw = ''
       res.on('data', chunk => raw += chunk)
@@ -115,14 +116,14 @@ async function callBaiduDishRecognition(accessToken, imageBase64, retryCount = 0
   const MAX_RETRIES = 1 // B03: 重试 1 次
 
   try {
-    const result = await httpPost(
+    const result = await httpPostForm(
       BAIDU_DISH_URL,
       `/rest/2.0/image-classify/v2/dish?access_token=${accessToken}`,
       {
         image: imageBase64,
-        top_num: 1,           // 只取最匹配的一个结果
-        filter_threshold: 0.7, // 置信度阈值
-        baike_num: 0,          // 不需要百科信息
+        top_num: '1',           // 只取最匹配的一个结果
+        filter_threshold: '0.7', // 置信度阈值
+        baike_num: '0',         // 不需要百科信息
       }
     )
 
