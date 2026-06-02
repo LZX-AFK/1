@@ -1,0 +1,14 @@
+# 依赖
+node_modules/
+
+# API Key（绝对不能提交）
+cloudfunctions/config/.env
+.env
+*.env
+
+# 微信开发者工具
+miniprogram_npm/
+
+# 临时文件
+temp_*
+*.tmp
