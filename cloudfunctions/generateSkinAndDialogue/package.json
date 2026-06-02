@@ -1,0 +1,9 @@
+{
+  "name": "generateSkinAndDialogue",
+  "version": "1.0.0",
+  "description": "生成食物角色皮肤图片+拟人对话 - 调用豆包API",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "identify",
+  "version": "1.0.0",
+  "description": "食物识别云函数 - 调用百度智能云菜品识别API",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest"
+  }
+}
