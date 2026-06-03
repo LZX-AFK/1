@@ -1,0 +1,117 @@
+{
+  "tab": {
+    "home": "Home",
+    "courses": "Courses",
+    "record": "Record",
+    "knowledge": "Library",
+    "profile": "Profile"
+  },
+  "common": {
+    "loading": "Loading...",
+    "retry": "Retry",
+    "empty": "Nothing here yet",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "comingSoon": "Coming Soon"
+  },
+  "home": {
+    "title": "Home",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "todayClass": "Today's Classes",
+    "startRecording": "Start Class Recording",
+    "recentNotes": "Recent Class Notes",
+    "quickActions": "Quick Actions",
+    "aiReminder": "AI Study Reminder",
+    "viewAll": "View All"
+  },
+  "courses": {
+    "title": "My Courses",
+    "searchPlaceholder": "Search courses",
+    "filter": {
+      "all": "All",
+      "current": "This Semester",
+      "done": "Completed"
+    },
+    "addCourse": "Add Course",
+    "empty": "No courses yet. Add your first one!"
+  },
+  "courseDetail": {
+    "title": "Course Detail",
+    "recordings": "Recordings",
+    "notes": "Notes",
+    "mistakes": "Mistakes",
+    "review": "Review"
+  },
+  "record": {
+    "prepareTitle": "Class Recording",
+    "liveTitle": "Live Transcript",
+    "course": "Course",
+    "lectureTitle": "Lecture Title",
+    "lectureLang": "Lecture Language",
+    "summaryLang": "Summary Language",
+    "keepTerms": "Keep Terms in English",
+    "noteStyle": "Note Style",
+    "startRecording": "Start Recording",
+    "stopRecording": "End Class",
+    "pause": "Pause",
+    "resume": "Resume",
+    "mark": "Mark",
+    "accuracy": "Accuracy",
+    "realtime": "Live",
+    "processing": "AI is generating your class summary...",
+    "processingSteps": {
+      "audio": "Processing audio",
+      "content": "Analyzing content",
+      "keypoints": "Identifying key points",
+      "summary": "Generating summary",
+      "personalize": "Personalizing for you"
+    }
+  },
+  "summary": {
+    "title": "AI Summary",
+    "structuredNotes": "Structured Notes",
+    "keyPoints": "Key Points",
+    "personalizedForYou": "Personalized for You",
+    "timelineMarks": "Timeline Marks",
+    "regenerate": "Regenerate"
+  },
+  "knowledge": {
+    "title": "Knowledge Library",
+    "searchPlaceholder": "Search courses, notes, marks…",
+    "recordings": "Recordings",
+    "aiNotes": "AI Notes",
+    "timelineMarks": "Timeline Marks",
+    "mistakes": "Mistakes",
+    "uploads": "Uploads",
+    "flashcards": "Flashcards",
+    "recentAdded": "Recently Added"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "studentProfile": "Student Profile",
+    "major": "Major",
+    "nativeLanguage": "Native Language",
+    "englishLevel": "English Level",
+    "studyGoal": "Study Goal",
+    "aiPreferences": "AI Preferences",
+    "noteStyle": "Note Style",
+    "keepTerms": "Keep Terms in English",
+    "extractKeypoints": "Auto-extract Exam Points",
+    "expandMarks": "Expand Unclear Marks",
+    "linkMistakes": "Link Mistakes to Courses",
+    "appLanguage": "App Language",
+    "device": "Device"
+  },
+  "device": {
+    "connected": "Earbuds Connected",
+    "disconnected": "No Device",
+    "battery": "Battery",
+    "anc": "ANC"
+  }
+}

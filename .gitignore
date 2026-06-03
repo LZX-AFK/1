@@ -1,2 +1,35 @@
+# Node
+node_modules/
+.pnpm-store/
+dist/
+.cache/
+
+# uni-app build output
+unpackage/
+classnote-ai/dist/
+classnote-ai/node_modules/
+oleap-fastify-demo/node_modules/
+
+# IDE
+.vscode/
+.hbuilderx/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env.local
+.env*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Private / workspace files
+projects/
 conversations/
-qpp前端页面框架/duplicates/

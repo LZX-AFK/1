@@ -1,0 +1,117 @@
+{
+  "tab": {
+    "home": "首页",
+    "courses": "课程",
+    "record": "录音",
+    "knowledge": "知识库",
+    "profile": "我的"
+  },
+  "common": {
+    "loading": "加载中...",
+    "retry": "重试",
+    "empty": "暂无数据",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "comingSoon": "即将开放"
+  },
+  "home": {
+    "title": "首页",
+    "greeting": {
+      "morning": "早上好",
+      "afternoon": "下午好",
+      "evening": "晚上好"
+    },
+    "todayClass": "今日课程",
+    "startRecording": "开始课堂录音",
+    "recentNotes": "最近课堂笔记",
+    "quickActions": "快捷操作",
+    "aiReminder": "AI 学习提醒",
+    "viewAll": "查看全部"
+  },
+  "courses": {
+    "title": "我的课程",
+    "searchPlaceholder": "搜索课程",
+    "filter": {
+      "all": "全部",
+      "current": "本学期",
+      "done": "已完成"
+    },
+    "addCourse": "添加课程",
+    "empty": "还没有课程，添加第一门课吧"
+  },
+  "courseDetail": {
+    "title": "课程详情",
+    "recordings": "录音",
+    "notes": "笔记",
+    "mistakes": "错题",
+    "review": "复习"
+  },
+  "record": {
+    "prepareTitle": "课堂录音",
+    "liveTitle": "实时转写",
+    "course": "课程",
+    "lectureTitle": "讲座标题",
+    "lectureLang": "课堂语言",
+    "summaryLang": "总结语言",
+    "keepTerms": "保留专业术语英文",
+    "noteStyle": "笔记风格",
+    "startRecording": "开始录音",
+    "stopRecording": "结束课堂",
+    "pause": "暂停",
+    "resume": "继续",
+    "mark": "标记",
+    "accuracy": "准确率",
+    "realtime": "实时",
+    "processing": "AI 正在生成课堂总结...",
+    "processingSteps": {
+      "audio": "正在处理音频",
+      "content": "正在分析内容",
+      "keypoints": "正在识别重点",
+      "summary": "正在生成总结",
+      "personalize": "正在为你个性化整理"
+    }
+  },
+  "summary": {
+    "title": "AI 总结",
+    "structuredNotes": "结构化笔记",
+    "keyPoints": "重点内容",
+    "personalizedForYou": "Personalized for You",
+    "timelineMarks": "时间轴标记",
+    "regenerate": "重新生成"
+  },
+  "knowledge": {
+    "title": "知识库",
+    "searchPlaceholder": "搜索课程、笔记、标记……",
+    "recordings": "录音记录",
+    "aiNotes": "AI 笔记",
+    "timelineMarks": "时间轴标记",
+    "mistakes": "错题",
+    "uploads": "上传资料",
+    "flashcards": "记忆卡片",
+    "recentAdded": "最近新增"
+  },
+  "profile": {
+    "title": "我的",
+    "editProfile": "编辑资料",
+    "studentProfile": "学生档案",
+    "major": "专业",
+    "nativeLanguage": "母语",
+    "englishLevel": "英语水平",
+    "studyGoal": "学习目标",
+    "aiPreferences": "AI 偏好设置",
+    "noteStyle": "笔记风格",
+    "keepTerms": "保留专业术语英文",
+    "extractKeypoints": "自动提取考试重点",
+    "expandMarks": "展开没听懂标记",
+    "linkMistakes": "关联错题与课程",
+    "appLanguage": "App 语言",
+    "device": "设备"
+  },
+  "device": {
+    "connected": "耳机已连接",
+    "disconnected": "未连接耳机",
+    "battery": "电量",
+    "anc": "降噪"
+  }
+}
