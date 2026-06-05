@@ -1,0 +1,74 @@
+[
+  {
+    "rid": "rId13",
+    "target": "../media/image10.jpeg",
+    "media_path": "ppt/media/image10.jpeg",
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework-v2\\extracted-slide02-all-media\\slide02_rId13_image10.jpeg",
+    "bytes": 389040,
+    "px": [
+      1280,
+      959
+    ],
+    "mode": "RGB"
+  },
+  {
+    "rid": "rId12",
+    "target": "../media/image9.png",
+    "media_path": "ppt/media/image9.png",
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework-v2\\extracted-slide02-all-media\\slide02_rId12_image9.png",
+    "bytes": 611852,
+    "px": [
+      943,
+      467
+    ],
+    "mode": "RGBA"
+  },
+  {
+    "rid": "rId11",
+    "target": "../media/image8.jpeg",
+    "media_path": "ppt/media/image8.jpeg",
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework-v2\\extracted-slide02-all-media\\slide02_rId11_image8.jpeg",
+    "bytes": 494679,
+    "px": [
+      1280,
+      960
+    ],
+    "mode": "RGB"
+  },
+  {
+    "rid": "rId10",
+    "target": "../media/image7.jpeg",
+    "media_path": "ppt/media/image7.jpeg",
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework-v2\\extracted-slide02-all-media\\slide02_rId10_image7.jpeg",
+    "bytes": 560737,
+    "px": [
+      1280,
+      960
+    ],
+    "mode": "RGB"
+  },
+  {
+    "rid": "rId9",
+    "target": "../media/image6.jpeg",
+    "media_path": "ppt/media/image6.jpeg",
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework-v2\\extracted-slide02-all-media\\slide02_rId9_image6.jpeg",
+    "bytes": 40792,
+    "px": [
+      550,
+      506
+    ],
+    "mode": "RGB"
+  },
+  {
+    "rid": "rId14",
+    "target": "../media/image11.jpeg",
+    "media_path": "ppt/media/image11.jpeg",
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework-v2\\extracted-slide02-all-media\\slide02_rId14_image11.jpeg",
+    "bytes": 458869,
+    "px": [
+      1264,
+      948
+    ],
+    "mode": "RGB"
+  }
+]

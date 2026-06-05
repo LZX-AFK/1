@@ -1,0 +1,132 @@
+{
+  "pages": [
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/courses/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/courses/detail",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/record/prepare",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/record/live",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/record/summary",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/knowledge/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/knowledge/course",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    },
+    {
+      "path": "pages/profile/learning-profile",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": ""
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F3F4F6"
+  },
+  "tabBar": {
+    "custom": false,
+    "color": "#6B7280",
+    "selectedColor": "#4F46E5",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/home-active.png"
+      },
+      {
+        "pagePath": "pages/courses/index",
+        "text": "课程",
+        "iconPath": "static/tabbar/courses.png",
+        "selectedIconPath": "static/tabbar/courses-active.png"
+      },
+      {
+        "pagePath": "pages/record/prepare",
+        "text": "录音",
+        "iconPath": "static/tabbar/record.png",
+        "selectedIconPath": "static/tabbar/record-active.png"
+      },
+      {
+        "pagePath": "pages/knowledge/index",
+        "text": "知识库",
+        "iconPath": "static/tabbar/knowledge.png",
+        "selectedIconPath": "static/tabbar/knowledge-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "static/tabbar/profile.png",
+        "selectedIconPath": "static/tabbar/profile-active.png"
+      }
+    ]
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^u-(.*)": "uview-plus/components/u-$1/u-$1.vue",
+      "^DeviceStatusBar$": "@/components/DeviceStatusBar.vue",
+      "^CourseCard$": "@/components/CourseCard.vue",
+      "^NoteCard$": "@/components/NoteCard.vue",
+      "^RecordingCard$": "@/components/RecordingCard.vue",
+      "^TimelineMark$": "@/components/TimelineMark.vue",
+      "^AISummarySection$": "@/components/AISummarySection.vue",
+      "^EmptyState$": "@/components/EmptyState.vue",
+      "^SearchBar$": "@/components/SearchBar.vue"
+    }
+  }
+}

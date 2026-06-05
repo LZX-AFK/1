@@ -1,176 +1,523 @@
 <template>
-  <view class="page">
-    <view class="safe-top" />
-    <view class="navbar">
-      <text class="navbar__title">{{ t('courses.title') }}</text>
-      <view class="navbar__add" @tap="showAdd = true">
-        <text class="navbar__add-icon">＋</text>
+  <view class="courses-page">
+    <!-- ========== Loading ========== -->
+    <template v-if="status === 'loading'">
+      <view class="courses-page__header">
+        <view class="skel skel--title" />
+        <view class="skel skel--btn" />
+      </view>
+      <view class="skel skel--search" style="margin-bottom:24rpx" />
+      <view class="skel skel--tabs" />
+      <view v-for="i in 4" :key="i" class="skel skel--card" />
+    </template>
+
+    <!-- ========== Error ========== -->
+    <view v-else-if="status === 'error'" class="courses-page__err">
+      <view class="courses-page__header">
+        <text class="courses-page__title">{{ $t('courses.title') }}</text>
+      </view>
+      <view class="courses-page__err-bar">
+        <text class="courses-page__err-text">{{ $t('common.error') }}</text>
+        <view class="courses-page__err-retry" @tap="initData">
+          <text class="courses-page__err-retry-text">{{ $t('common.retry') }}</text>
+        </view>
       </view>
     </view>
 
-    <SearchBar v-model="keyword" :placeholder="t('courses.searchPlaceholder')" />
-
-    <scroll-view scroll-y class="scroll">
-      <view class="filter-row">
-        <view
-          v-for="f in filters"
-          :key="f.key"
-          :class="['filter-chip', activeFilter === f.key ? 'filter-chip--active' : '']"
-          @tap="activeFilter = f.key"
-        >
-          <text>{{ f.label }}</text>
+    <!-- ========== Normal / Empty ========== -->
+    <template v-else>
+      <!-- ① 标题 + 添加按钮 -->
+      <view class="courses-page__header">
+        <text class="courses-page__title">{{ $t('courses.title') }}</text>
+        <view class="courses-page__add" @tap="showModal = true">
+          <text class="courses-page__add-icon">＋</text>
         </view>
       </view>
 
-      <view v-if="filteredCourses.length" class="list">
-        <CourseCard
-          v-for="c in filteredCourses"
-          :key="c.id"
-          :course="c"
-          variant="full"
-          @tap="goCourseDetail(c.id)"
+      <!-- ② 搜索栏 -->
+      <view class="courses-page__search">
+        <SearchBar
+          v-model="searchQuery"
+          :placeholder="$t('courses.searchPlaceholder')"
         />
       </view>
-      <EmptyState v-else :message="t('courses.empty')" :cta-text="t('courses.addCourse')" @action="showAdd = true" />
 
-      <view class="safe-bottom" />
-    </scroll-view>
-
-    <!-- 添加课程 BottomSheet -->
-    <view v-if="showAdd" class="sheet-mask sheet-mask--visible" @tap="showAdd = false">
-      <view class="sheet" @tap.stop>
-        <view class="sheet__handle" />
-        <view class="sheet__header">
-          <text class="sheet__title">Add New Course</text>
-          <text class="sheet__close" @tap="showAdd = false">✕</text>
+      <!-- ③ 筛选 Tab -->
+      <scroll-view scroll-x class="courses-page__tabs">
+        <view class="courses-page__tabs-inner">
+          <view
+            v-for="tab in filterTabs"
+            :key="tab.key"
+            class="courses-page__tab"
+            :class="{ 'courses-page__tab--active': activeFilter === tab.key }"
+            @tap="activeFilter = tab.key"
+          >
+            <text
+              class="courses-page__tab-text"
+              :class="{ 'courses-page__tab-text--active': activeFilter === tab.key }"
+            >{{ tab.label }}</text>
+          </view>
         </view>
-        <scroll-view scroll-y class="sheet__form">
-          <view class="form-row">
-            <text class="form-label">Course Name</text>
-            <input class="form-input" v-model="newCourse.name" placeholder="e.g. Biology 101" :adjust-position="false" />
+      </scroll-view>
+
+      <!-- ④ 空态 -->
+      <EmptyState
+        v-if="filteredCourses.length === 0"
+        icon="📚"
+        :title="$t('courses.noCourses')"
+        :description="$t('courses.noCoursesDesc')"
+        :action-text="$t('courses.addCourseAction')"
+        @action="showModal = true"
+      />
+
+      <!-- ⑤ 课程列表 -->
+      <template v-else>
+        <view class="courses-page__list">
+          <view
+            v-for="course in filteredCourses"
+            :key="course.id"
+            class="courses-page__card-wrap"
+          >
+            <CourseCard
+              :course="course"
+              variant="full"
+              class="courses-page__card"
+              @click="goDetail(course.id)"
+            />
+            <view v-if="reviewCountByCourse[course.id]" class="courses-page__review-badge">
+              <text class="courses-page__review-badge-dot">●</text>
+              <text class="courses-page__review-badge-text">{{ reviewCountByCourse[course.id] }} 个待复习</text>
+            </view>
           </view>
-          <view class="form-row">
-            <text class="form-label">Instructor</text>
-            <input class="form-input" v-model="newCourse.instructor" placeholder="e.g. Prof. Smith" :adjust-position="false" />
+        </view>
+      </template>
+    </template>
+
+    <!-- ========== 添加课程弹窗 ========== -->
+    <view v-if="showModal" class="modal-mask" @tap="showModal = false">
+      <view class="modal-panel" @tap.stop>
+        <text class="modal-panel__title">{{ $t('courses.modalTitle') }}</text>
+
+        <view class="modal-panel__field">
+          <text class="modal-panel__label">{{ $t('courses.courseName') }}</text>
+          <input
+            class="modal-panel__input"
+            v-model="form.name"
+            placeholder="例如：高等数学"
+          />
+        </view>
+
+        <view class="modal-panel__field">
+          <text class="modal-panel__label">{{ $t('courses.instructor') }}</text>
+          <input
+            class="modal-panel__input"
+            v-model="form.instructor"
+            placeholder="张教授"
+          />
+        </view>
+
+        <view class="modal-panel__field">
+          <text class="modal-panel__label">{{ $t('courses.schedule') }}</text>
+          <input
+            class="modal-panel__input"
+            v-model="form.schedule"
+            placeholder="周一/周三 上午 10:00"
+          />
+        </view>
+
+        <view class="modal-panel__field">
+          <text class="modal-panel__label">{{ $t('courses.location') }}</text>
+          <input
+            class="modal-panel__input"
+            v-model="form.semester"
+            placeholder="2026 春季"
+          />
+        </view>
+
+        <view class="modal-panel__actions">
+          <view class="modal-panel__btn modal-panel__btn--cancel" @tap="showModal = false">
+            <text>{{ $t('common.cancel') }}</text>
           </view>
-          <view class="form-row">
-            <text class="form-label">Schedule</text>
-            <input class="form-input" v-model="newCourse.schedule" placeholder="e.g. Mon/Wed 10:00" :adjust-position="false" />
+          <view class="modal-panel__btn modal-panel__btn--save" @tap="handleAddCourse">
+            <text class="modal-panel__btn-save-text">{{ $t('courses.saveCourse') }}</text>
           </view>
-          <view style="height: 40rpx" />
-        </scroll-view>
-        <view class="sheet__btns">
-          <view class="sheet__btn sheet__btn--cancel" @tap="showAdd = false"><text>{{ t('common.cancel') }}</text></view>
-          <view class="sheet__btn sheet__btn--save" @tap="saveCourse"><text>{{ t('common.save') }}</text></view>
         </view>
       </view>
     </view>
   </view>
+
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { storeToRefs } from 'pinia'
 import { useCourseStore } from '@/stores/useCourseStore'
+import type { Course } from '@/types'
 
 const { t } = useI18n()
 const courseStore = useCourseStore()
-const { courses } = storeToRefs(courseStore)
 
-const keyword = ref('')
+// --- 页面状态 ---
+type PageStatus = 'loading' | 'normal' | 'empty' | 'error'
+const status = ref<PageStatus>('loading')
+
+// --- 搜索 & 筛选 ---
+const searchQuery = ref('')
 const activeFilter = ref('all')
-const showAdd = ref(false)
-const newCourse = ref({ name: '', instructor: '', schedule: '' })
 
-const filters = [
-  { key: 'all', label: t('courses.filter.all') },
-  { key: 'current', label: t('courses.filter.current') },
-  { key: 'done', label: t('courses.filter.done') },
-]
+const filterTabs = computed(() => [
+  { key: 'all', label: t('courses.filterAll') },
+  { key: 'current', label: t('courses.filterThisSemester') },
+  { key: 'done', label: t('courses.filterCompleted') },
+])
 
-const filteredCourses = computed(() =>
-  courses.value.filter(c => {
-    if (keyword.value && !c.name.toLowerCase().includes(keyword.value.toLowerCase())) return false
-    if (activeFilter.value === 'current') return c.status !== 'done'
-    if (activeFilter.value === 'done') return c.status === 'done'
-    return true
-  })
-)
+const filteredCourses = computed(() => {
+  let list = courseStore.courses
 
-function goCourseDetail(id: string) {
-  courseStore.selectCourse(id)
-  uni.navigateTo({ url: `/pages/courses/detail?id=${id}` })
+  // 搜索过滤
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.trim().toLowerCase()
+    list = list.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.instructor.toLowerCase().includes(q),
+    )
+  }
+
+  // 筛选
+  if (activeFilter.value === 'current') {
+    list = list.filter((c) => c.progress < 100)
+  } else if (activeFilter.value === 'done') {
+    list = list.filter((c) => c.progress === 100)
+  }
+
+  return list
+})
+
+// --- 待复习 badge ---
+const reviewCountByCourse = computed<Record<string, number>>(() => ({ c1: 2 }))
+
+// --- 添加课程弹窗 ---
+const showModal = ref(false)
+const form = reactive({
+  name: '',
+  instructor: '',
+  schedule: '',
+  semester: '',
+})
+
+function handleAddCourse() {
+  if (!form.name.trim()) return
+
+  const newCourse: Course = {
+    id: `c${Date.now()}`,
+    name: form.name.trim(),
+    subject: form.name.trim(),
+    instructor: form.instructor.trim() || '待指定',
+    schedule: form.schedule.trim() || '待指定',
+    location: form.semester.trim() || '待指定',
+    totalRecordings: 0,
+    totalNotes: 0,
+    progress: 0,
+  }
+
+  courseStore.addCourse(newCourse)
+  showModal.value = false
+
+  // 重置表单
+  form.name = ''
+  form.instructor = ''
+  form.schedule = ''
+  form.semester = ''
 }
 
-let savingCourse = false
-function saveCourse() {
-  if (!newCourse.value.name || savingCourse) return
-  savingCourse = true
-  courses.value.push({
-    id: `course-${Date.now()}`,
-    name: newCourse.value.name,
-    instructor: newCourse.value.instructor,
-    schedule: newCourse.value.schedule,
-    location: '',
-    semester: '2026 春季',
-    color: '#4F46E5',
-    icon: '📚',
-    recordingCount: 0, noteCount: 0, markCount: 0, accuracy: 0,
-  })
-  newCourse.value = { name: '', instructor: '', schedule: '' }
-  showAdd.value = false
-  uni.showToast({ title: '课程已添加', icon: 'success' })
-  setTimeout(() => { savingCourse = false }, 600)
+// --- 导航 ---
+function goDetail(courseId: string, toReview = false) {
+  const url = toReview
+    ? `/pages/courses/detail?id=${courseId}&tab=review`
+    : `/pages/courses/detail?id=${courseId}`
+  uni.navigateTo({ url })
 }
+
+// --- 初始化 ---
+function initData() {
+  status.value = 'loading'
+  // 模拟网络延迟，10% 概率触发错误态
+  setTimeout(() => {
+    if (Math.random() < 0.1) {
+      status.value = 'error'
+    } else {
+      status.value = 'normal'
+    }
+  }, 500)
+}
+
+initData()
 </script>
 
-<style scoped lang="scss">
-.page { min-height: 100vh; background: $color-bg-page; display: flex; flex-direction: column; }
-.safe-top { height: var(--status-bar-height, 44px); }
-.safe-bottom { height: calc(120rpx + env(safe-area-inset-bottom)); }
-.navbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: $spacing-sm $spacing-lg $spacing-md; background: $color-bg-card;
-  &__title { font-size: $font-size-2xl; font-weight: $font-weight-bold; color: $color-text-primary; }
-  &__add { width: 72rpx; height: 72rpx; background: $color-primary; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  &__add-icon { font-size: 40rpx; color: #fff; font-weight: bold; }
+<style lang="scss" scoped>
+// ==============================
+// 页面根容器
+// ==============================
+.courses-page {
+  min-height: 100vh;
+  background: #FAFAF5;
+  padding: 32rpx;
+  padding-top: calc(72rpx + env(safe-area-inset-top));
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
-.scroll { flex: 1; }
-.filter-row { display: flex; gap: $spacing-sm; padding: $spacing-md $spacing-lg; }
-.filter-chip {
-  padding: $spacing-xs $spacing-md; border-radius: $radius-round; background: $color-bg-card;
-  font-size: $font-size-sm; color: $color-text-secondary; border: 1rpx solid #E5E7EB;
-  &--active { background: $color-primary; color: #fff; border-color: $color-primary; }
-}
-.list { display: flex; flex-direction: column; gap: $spacing-md; padding: 0 $spacing-lg; }
 
-.sheet-mask {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; align-items: flex-end;
-  background: rgba(0,0,0,0); transition: background $transition-normal;
-  &--visible { background: rgba(0,0,0,0.4); }
+// ==============================
+// 骨架屏
+// ==============================
+.skel {
+  background: linear-gradient(90deg, #E5E7EB 25%, #F3F4F6 50%, #E5E7EB 75%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.5s ease-in-out infinite;
+  border-radius: 16rpx;
+
+  &--title   { width: 240rpx; height: 40rpx; }
+  &--btn     { width: 64rpx;  height: 64rpx; border-radius: 32rpx; }
+  &--search  { width: 100%;   height: 80rpx; border-radius: 24rpx; }
+  &--tabs    { width: 100%;   height: 64rpx; margin-bottom: 24rpx; }
+  &--card    { width: 100%;   height: 160rpx; margin-bottom: 24rpx; }
 }
-.sheet {
-  width: 100%; background: $color-bg-card; border-radius: $radius-2xl $radius-2xl 0 0; padding: $spacing-md $spacing-lg;
-  transform: translateY(100%); transition: transform $transition-normal;
-  .sheet-mask--visible & { transform: translateY(0); }
-  &__handle { width: 80rpx; height: 8rpx; background: #E5E7EB; border-radius: 4rpx; margin: 0 auto $spacing-md; }
-  &__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: $spacing-lg; }
-  &__title { font-size: $font-size-xl; font-weight: $font-weight-semibold; color: $color-text-primary; }
-  &__close { font-size: 36rpx; color: $color-text-tertiary; }
-  &__form { display: flex; flex-direction: column; gap: $spacing-md; margin-bottom: $spacing-lg; }
-  &__btns { display: flex; gap: $spacing-md; padding-bottom: env(safe-area-inset-bottom); }
-  &__btn {
-    flex: 1; height: 88rpx; border-radius: $radius-lg; display: flex; align-items: center; justify-content: center;
-    font-size: $font-size-md; font-weight: $font-weight-medium;
-    &--cancel { background: #F3F4F6; color: $color-text-secondary; }
-    &--save { background: $color-primary; color: #fff; }
+
+@keyframes skel-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ==============================
+// Header
+// ==============================
+.courses-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.courses-page__title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+.courses-page__add {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 32rpx;
+  background: #4F46E5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.courses-page__add-icon {
+  font-size: 36rpx;
+  color: #FFFFFF;
+  font-weight: 300;
+  line-height: 1;
+}
+
+// ==============================
+// Search
+// ==============================
+.courses-page__search {
+  margin-bottom: 24rpx;
+}
+
+// ==============================
+// Filter tabs
+// ==============================
+.courses-page__tabs {
+  margin-bottom: 24rpx;
+  white-space: nowrap;
+}
+
+.courses-page__tabs-inner {
+  display: flex;
+  gap: 16rpx;
+}
+
+.courses-page__tab {
+  padding: 14rpx 32rpx;
+  border-radius: 32rpx;
+  background: #FFFFFF;
+  flex-shrink: 0;
+
+  &--active {
+    background: #4F46E5;
   }
 }
-.form-row { display: flex; flex-direction: column; gap: $spacing-xs; }
-.form-label { font-size: $font-size-sm; color: $color-text-secondary; }
-.form-input {
-  height: 88rpx; background: #F9FAFB; border-radius: $radius-lg;
-  padding: 0 $spacing-md; font-size: $font-size-md; color: $color-text-primary; border: 1rpx solid #E5E7EB;
+
+.courses-page__tab-text {
+  font-size: 28rpx;
+  color: #6B7280;
+
+  &--active {
+    color: #FFFFFF;
+    font-weight: 500;
+  }
+}
+
+// ==============================
+// Course list
+// ==============================
+.courses-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.courses-page__card-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.courses-page__card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.courses-page__review-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 6rpx 18rpx;
+  background: #FEF2F2;
+  border: 2rpx solid #FECACA;
+  border-radius: 32rpx;
+}
+.courses-page__review-badge-dot {
+  font-size: 20rpx;
+  color: #EF4444;
+}
+.courses-page__review-badge-text {
+  font-size: 22rpx;
+  color: #EF4444;
+  font-weight: 500;
+}
+
+// ==============================
+// Error
+// ==============================
+.courses-page__err-bar {
+  background: #FEF2F2;
+  border: 2rpx solid #FECACA;
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.courses-page__err-text {
+  font-size: 28rpx;
+  color: #EF4444;
+  flex: 1;
+}
+
+.courses-page__err-retry {
+  padding: 12rpx 32rpx;
+  background: #EF4444;
+  border-radius: 24rpx;
+  flex-shrink: 0;
+}
+
+.courses-page__err-retry-text {
+  font-size: 24rpx;
+  color: #FFFFFF;
+}
+
+// ==============================
+// Modal (add course)
+// ==============================
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.modal-panel {
+  width: 100%;
+  max-width: 430px;
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 40rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.modal-panel__title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #1F2937;
+  text-align: center;
+  display: block;
+  margin-bottom: 36rpx;
+}
+
+.modal-panel__field {
+  margin-bottom: 24rpx;
+}
+
+.modal-panel__label {
+  font-size: 24rpx;
+  color: #6B7280;
+  margin-bottom: 12rpx;
+  display: block;
+}
+
+.modal-panel__input {
+  width: 100%;
+  height: 80rpx;
+  background: #F9FAFB;
+  border: 2rpx solid #E5E7EB;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1F2937;
+  box-sizing: border-box;
+}
+
+.modal-panel__actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 36rpx;
+}
+
+.modal-panel__btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  box-sizing: border-box;
+
+  &--cancel {
+    background: #F3F4F6;
+    color: #6B7280;
+  }
+
+  &--save {
+    background: #4F46E5;
+  }
+}
+
+.modal-panel__btn-save-text {
+  color: #FFFFFF;
 }
 </style>

@@ -1,0 +1,82 @@
+[
+  {
+    "slide": 2,
+    "image": 1,
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework\\extracted-images\\slide02_image01.jpg",
+    "px": [
+      550,
+      506
+    ],
+    "shape_inches": [
+      0.71,
+      0.54,
+      3.27,
+      3.01
+    ],
+    "bytes": 40792
+  },
+  {
+    "slide": 3,
+    "image": 1,
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework\\extracted-images\\slide03_image01.jpg",
+    "px": [
+      702,
+      901
+    ],
+    "shape_inches": [
+      0.82,
+      0.74,
+      3.19,
+      4.1
+    ],
+    "bytes": 203590
+  },
+  {
+    "slide": 3,
+    "image": 2,
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework\\extracted-images\\slide03_image02.png",
+    "px": [
+      1633,
+      1285
+    ],
+    "shape_inches": [
+      8.7,
+      0.64,
+      4.16,
+      3.27
+    ],
+    "bytes": 681206
+  },
+  {
+    "slide": 4,
+    "image": 1,
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework\\extracted-images\\slide04_image01.png",
+    "px": [
+      961,
+      1360
+    ],
+    "shape_inches": [
+      1.21,
+      0.47,
+      3.9,
+      5.52
+    ],
+    "bytes": 270528
+  },
+  {
+    "slide": 4,
+    "image": 2,
+    "file": "D:\\classnote-ai-hx\\outputs\\yanqiao-pages-02-04-framework\\extracted-images\\slide04_image02.png",
+    "px": [
+      763,
+      985
+    ],
+    "shape_inches": [
+      8.54,
+      0.39,
+      2.66,
+      3.44
+    ],
+    "bytes": 144569
+  }
+]

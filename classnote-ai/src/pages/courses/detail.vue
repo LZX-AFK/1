@@ -1,177 +1,461 @@
 <template>
-  <view class="page">
-    <view class="safe-top" />
-    <view class="navbar">
-      <text class="navbar__back" @tap="uni.navigateBack()">‹</text>
-      <text class="navbar__title">{{ course?.name || t('courseDetail.title') }}</text>
-      <view class="navbar__placeholder" />
+  <!-- Loading -->
+  <view v-if="status === 'loading'" class="cd-loading">
+    <view class="cd-nav"><view class="cd-nav-skel" /></view>
+    <view class="cd-hdr-skel" />
+    <view class="cd-tab-skel" />
+    <view v-for="i in 3" :key="i" class="cd-card-skel" />
+  </view>
+
+  <!-- Error -->
+  <view v-else-if="status === 'error'" class="cd-error">
+    <view class="cd-nav" @tap="goBack" hover-class="cd-nav--hover"><text class="cd-nav-back">← {{ $t('common.back') }}</text></view>
+    <view class="cd-error-bar" @click="retry"><text>{{ $t('courseDetail.error') }}</text></view>
+  </view>
+
+  <!-- Empty: no course -->
+  <view v-else-if="status === 'empty'">
+    <view class="cd-nav" @tap="goBack" hover-class="cd-nav--hover"><text class="cd-nav-back">← {{ $t('common.back') }}</text></view>
+    <EmptyState
+      icon="📭"
+      :title="$t('courseDetail.notFound')"
+      :description="$t('courseDetail.notFoundDesc')"
+      :actionText="$t('courseDetail.goBackCourses')"
+      @action="goBack"
+    />
+  </view>
+
+  <!-- Normal -->
+  <view v-else class="course-detail-page">
+    <!-- 1. Top Nav -->
+    <view class="cd-nav" @tap="goBack" hover-class="cd-nav--hover">
+      <text class="cd-nav-back">← {{ $t('common.back') }}</text>
+      <text class="cd-nav-title">{{ courseName }}</text>
     </view>
 
-    <!-- 课程信息头 -->
-    <view v-if="course" class="course-header">
-      <view class="course-header__color" :style="{ background: course.color }" />
-      <view class="course-header__info">
-        <text class="course-header__name">{{ course.icon }} {{ course.name }}</text>
-        <text class="course-header__sub">{{ course.instructor }} · {{ course.schedule }}</text>
-        <text class="course-header__sub">{{ course.semester }}</text>
-        <view class="course-header__stats">
-          <text class="course-header__stat">🎙️ {{ course.recordingCount }}</text>
-          <text class="course-header__stat">📝 {{ course.noteCount }}</text>
-          <text class="course-header__stat">📊 {{ course.accuracy }}%</text>
+    <!-- 2. Course Info Header Card -->
+    <view class="cd-header">
+      <view class="cd-header-top">
+        <text class="cd-header-course">{{ courseName }}</text>
+        <text class="cd-header-instructor">{{ instructor }}</text>
+        <text class="cd-header-meta">{{ courseSchedule }} · {{ courseLocation }}</text>
+        <text class="cd-header-term">{{ $t('courseDetail.semester') }}</text>
+      </view>
+      <view class="cd-stats">
+        <view class="cd-stat">
+          <text class="cd-stat-num">{{ totalRecordings }}</text>
+          <text class="cd-stat-label">{{ $t('common.recording') }}</text>
+        </view>
+        <view class="cd-stat">
+          <text class="cd-stat-num">{{ totalNotes }}</text>
+          <text class="cd-stat-label">{{ $t('common.note') }}</text>
+        </view>
+        <view class="cd-stat">
+          <text class="cd-stat-num">{{ totalMarks }}</text>
+          <text class="cd-stat-label">{{ $t('common.mark') }}</text>
+        </view>
+        <view class="cd-stat">
+          <text class="cd-stat-num cd-stat-num--green">{{ avgAccuracy }}%</text>
+          <text class="cd-stat-label">{{ $t('common.accuracy') }}</text>
         </view>
       </view>
     </view>
 
-    <!-- Tab 栏 -->
-    <view class="tabs">
+    <!-- 3. Tab Bar -->
+    <view class="cd-tabs">
       <view
-        v-for="(tab, i) in tabs"
-        :key="tab"
-        :class="['tab', activeTab === i ? 'tab--active' : '']"
-        @tap="activeTab = i"
+        v-for="tab in tabs"
+        :key="tab.key"
+        class="cd-tab"
+        :class="{ 'cd-tab--active': currentTab === tab.key }"
+        @click="currentTab = tab.key"
       >
-        <text>{{ tab }}</text>
+        <text>{{ tab.label }}</text>
       </view>
     </view>
 
-    <!-- Tab 内容 -->
-    <scroll-view scroll-y class="scroll">
-      <!-- Sessions Tab -->
-      <view v-if="activeTab === 0" class="tab-content">
-        <view class="list">
-          <RecordingCard
-            v-for="r in mockRecordings"
-            :key="r.id"
-            :recording="r"
-            @tap="uni.navigateTo({ url: '/pages/record/summary' })"
-            @play="uni.showToast({ title: 'Mock 播放', icon: 'none' })"
-            @transcript="uni.showToast({ title: '转写文本', icon: 'none' })"
-            @summary="uni.navigateTo({ url: '/pages/record/summary' })"
-          />
+    <!-- 4. Tab Content -->
+    <!-- Recordings Tab -->
+    <view v-if="currentTab === 'recordings'" class="cd-content">
+      <RecordingCard
+        v-for="rec in courseRecordings"
+        :key="rec.id"
+        :recording="rec"
+        @play="handlePlay"
+        @transcript="handleTranscript"
+        @summary="handleSummary"
+        @click="handleSummary"
+      />
+      <EmptyState
+        v-if="!courseRecordings.length"
+        icon="🎙️"
+        :title="$t('courseDetail.noRecordings')"
+        :description="$t('courseDetail.noRecordingsDesc')"
+        :actionText="$t('courseDetail.goStartRecording')"
+        @action="goRecord"
+      />
+    </view>
+
+    <!-- Notes Tab -->
+    <view v-if="currentTab === 'notes'" class="cd-content">
+      <NoteCard
+        v-for="note in courseNotes"
+        :key="note.id"
+        :note="note"
+        showCourseName
+        @click="handleNoteClick"
+      />
+      <EmptyState
+        v-if="!courseNotes.length"
+        icon="📝"
+        :title="$t('courseDetail.noNotes')"
+        :description="$t('courseDetail.noNotesDesc')"
+      />
+    </view>
+
+    <!-- Mistakes Tab -->
+    <view v-if="currentTab === 'mistakes'" class="cd-content">
+      <view v-for="m in courseMistakes" :key="m.id" class="cd-mistake-card" @click="handleMistakeClick">
+        <view class="cd-mistake-header">
+          <text class="cd-mistake-topic">{{ m.topicLabel }}</text>
+          <text class="cd-mistake-status" :class="{ 'cd-mistake-status--done': m.correctAnswer }">
+            {{ m.correctAnswer ? $t('courseDetail.statusReviewed') : $t('courseDetail.statusNotMastered') }}
+          </text>
+        </view>
+        <text class="cd-mistake-question">{{ m.question }}</text>
+        <view class="cd-mistake-tags">
+          <text class="cd-mistake-tag">{{ m.topicLabel }}</text>
         </view>
       </view>
+      <EmptyState
+        v-if="!courseMistakes.length"
+        icon="❌"
+        :title="$t('courseDetail.noMistakes')"
+        :description="$t('courseDetail.noMistakesDesc')"
+      />
+    </view>
 
-      <!-- Notes Tab -->
-      <view v-if="activeTab === 1" class="tab-content">
-        <view class="list">
-          <NoteCard
-            v-for="n in mockNotes"
-            :key="n.id"
-            :note="n"
-            @tap="uni.navigateTo({ url: '/pages/record/summary' })"
-          />
-        </view>
-      </view>
-
-      <!-- Mistakes Tab -->
-      <view v-if="activeTab === 2" class="tab-content">
-        <EmptyState message="还没有错题" cta-text="Coming Soon" />
-      </view>
-
-      <!-- Review Tab -->
-      <view v-if="activeTab === 3" class="tab-content">
-        <view class="review-card">
-          <text class="review-card__title">📋 Today's Review Plan</text>
-          <view v-for="(task, i) in reviewTasks" :key="i" class="review-task" @tap="task.done = !task.done">
-            <text class="review-task__check">{{ task.done ? '☑' : '☐' }}</text>
-            <text :class="['review-task__text', task.done ? 'review-task__text--done' : '']">{{ task.text }}</text>
+    <!-- Review Tab -->
+    <view v-if="currentTab === 'review'" class="cd-content">
+      <view class="cd-review-card">
+        <text class="cd-review-title">📋 {{ $t('courseDetail.todayReviewPlan') }}</text>
+        <view
+          v-for="task in reviewTasks"
+          :key="task.id"
+          class="cd-review-task"
+          @click="toggleTask(task.id)"
+        >
+          <view class="cd-review-check" :class="{ 'cd-review-check--done': task.completed }">
+            <text v-if="task.completed" class="cd-review-check-icon">✓</text>
           </view>
-          <view class="review-weak">
-            <text class="review-weak__label">🟡 Weak point: Genetic Expression</text>
-          </view>
+          <text class="cd-review-task-text" :class="{ 'cd-review-task-text--done': task.completed }">{{ task.title }}</text>
         </view>
       </view>
+      <view v-if="courseMistakes.length > 0" class="cd-weakness-card">
+        <text class="cd-weakness-title">⚠️ {{ $t('courseDetail.weaknessAreas') }}</text>
+        <view class="cd-weakness-list">
+          <text v-for="m in courseMistakes" :key="m.id" class="cd-weakness-item">{{ m.topicLabel }}</text>
+        </view>
+      </view>
+      <EmptyState
+        v-if="!reviewTasks.length"
+        icon="📊"
+        :title="$t('courseDetail.noReview')"
+        :description="$t('courseDetail.noReviewDesc')"
+      />
+    </view>
 
-      <view class="safe-bottom" />
-    </scroll-view>
+    <!-- Transcript Modal -->
+    <view v-if="showTranscript" class="cd-modal-mask" @click="showTranscript = false">
+      <view class="cd-modal" @click.stop>
+        <view class="cd-modal-header">
+          <text class="cd-modal-title">{{ $t('common.transcript') }}</text>
+          <text class="cd-modal-close" @click="showTranscript = false">✕</text>
+        </view>
+        <scroll-view class="cd-modal-body" scroll-y>
+          <text class="cd-modal-text">{{ transcriptText }}</text>
+        </scroll-view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { onLoad } from '@dcloudio/uni-app'
-import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { useCourseStore } from '@/stores/useCourseStore'
-import type { Recording, AINote } from '@/types/index'
 
+const store = useCourseStore()
 const { t } = useI18n()
-const courseStore = useCourseStore()
-const { courses } = storeToRefs(courseStore)
-
 const courseId = ref('')
-const activeTab = ref(0)
+const status = ref<'loading' | 'normal' | 'empty' | 'error'>('loading')
+const currentTab = ref('recordings')
+const showTranscript = ref(false)
+const transcriptText = ref('')
 
-onLoad((query) => {
-  courseId.value = query?.id || ''
-  courseStore.selectCourse(courseId.value)
+const tabs = computed(() => [
+  { key: 'recordings', label: t('courseDetail.recordings') },
+  { key: 'notes', label: t('courseDetail.notes') },
+  { key: 'mistakes', label: t('courseDetail.mistakes') },
+  { key: 'review', label: t('courseDetail.review') },
+])
+
+const courseData = computed(() => store.getCourseById(courseId.value))
+const courseRecordings = computed(() => store.getRecordingsByCourseId(courseId.value))
+const courseNotes = computed(() => store.getNotesByCourseId(courseId.value))
+const courseMistakes = computed(() => store.getMistakesByCourseId(courseId.value))
+const reviewTasks = computed(() => store.getReviewTasksForCourse(courseId.value))
+
+const courseName = computed(() => courseData.value?.name ?? '')
+const instructor = computed(() => courseData.value?.instructor ?? '')
+const courseSchedule = computed(() => courseData.value?.schedule ?? '')
+const courseLocation = computed(() => courseData.value?.location ?? '')
+const totalRecordings = computed(() => courseData.value?.totalRecordings ?? 0)
+const totalNotes = computed(() => courseData.value?.totalNotes ?? 0)
+const totalMarks = computed(() => courseRecordings.value.reduce((s, r) => s + (r.markCount || 0), 0))
+
+const avgAccuracy = computed(() => {
+  const recs = courseRecordings.value
+  if (!recs.length) return 0
+  return Math.round(recs.reduce((s, r) => s + r.accuracy, 0) / recs.length)
 })
 
-const course = computed(() => courses.value.find(c => c.id === courseId.value))
-const tabs = [t('courseDetail.recordings'), t('courseDetail.notes'), t('courseDetail.mistakes'), t('courseDetail.review')]
+onLoad((opts: Record<string, string> | undefined) => {
+  if (opts?.id) {
+    courseId.value = opts.id
+  }
+  loadData()
+})
 
-const mockRecordings: Recording[] = [
-  { id: 'rec-001', courseId: 'course-001', title: 'Cell Division', date: '2026-05-28', duration: 3120, accuracy: 95, markCount: 4, noteCount: 1, status: 'done' },
-  { id: 'rec-002', courseId: 'course-001', title: 'Mitosis Deep Dive', date: '2026-05-21', duration: 2700, accuracy: 92, markCount: 2, noteCount: 1, status: 'done' },
-]
+function loadData() {
+  status.value = 'loading'
+  setTimeout(() => {
+    if (!courseData.value) {
+      status.value = 'empty'
+      return
+    }
+    status.value = 'normal'
+  }, 500)
+}
 
-const mockNotes: AINote[] = [
-  {
-    id: 'note-001', recordingId: 'rec-001', courseId: 'course-001',
-    title: 'Cell Division Overview', date: '2026-05-28', duration: 3120,
-    structuredNotes: [], keyPoints: ['Mitosis phases', 'Meiosis difference'],
-    marks: [], personalized: { insight: '', terms: [], suggestions: [] },
-    tags: ['mitosis', 'meiosis'],
-  },
-]
+function retry() {
+  loadData()
+}
 
-const reviewTasks = ref([
-  { text: 'Review Cell Division (10 min)', done: false },
-  { text: '5 flashcards', done: false },
-  { text: 'Replay 2 marked moments', done: false },
-])
+function goBack() {
+  uni.navigateBack({ fail() { uni.switchTab({ url: '/pages/knowledge/index' }) } })
+}
+
+function goRecord() {
+  uni.navigateTo({ url: '/pages/record/live' })
+}
+
+function handlePlay() {
+  uni.showToast({ title: t('courseDetail.playComingSoon'), icon: 'none' })
+}
+
+function handleTranscript(rec: { id: string; courseName: string; date: string }) {
+  transcriptText.value = `【${rec.courseName} · ${rec.date}】\n\n本节课覆盖了细胞分裂的基础知识，包括间期的 G1/S/G2 子阶段和有丝分裂的四个阶段。重点讨论了 DNA 复制机制和细胞周期检查点调控。讲师在课堂中多次强调了染色体分离过程中纺锤体的重要作用...\n\n[转录文本仅供演示]`
+  showTranscript.value = true
+}
+
+function handleSummary(rec: { id: string }) {
+  uni.navigateTo({ url: `/pages/record/summary?id=${rec.id}` })
+}
+
+function handleNoteClick(note: { id: string }) {
+  uni.navigateTo({ url: `/pages/record/summary?id=${note.id}` })
+}
+
+function handleMistakeClick() {
+  uni.showToast({ title: t('courseDetail.mistakeComingSoon'), icon: 'none' })
+}
+
+function toggleTask(taskId: string) {
+  store.toggleReviewTask(taskId)
+}
 </script>
 
-<style scoped lang="scss">
-.page { min-height: 100vh; background: $color-bg-page; display: flex; flex-direction: column; }
-.safe-top { height: var(--status-bar-height, 44px); }
-.safe-bottom { height: calc(120rpx + env(safe-area-inset-bottom)); }
-.navbar {
-  display: flex; align-items: center; padding: $spacing-sm $spacing-lg; background: $color-bg-card;
-  &__back { font-size: 60rpx; color: $color-primary; margin-right: $spacing-sm; line-height: 1; }
-  &__title { flex: 1; font-size: $font-size-xl; font-weight: $font-weight-semibold; color: $color-text-primary; }
-  &__placeholder { width: 60rpx; }
+<style lang="scss" scoped>
+.course-detail-page {
+  min-height: 100vh;
+  background: #FAFAF5;
+  padding: 32rpx;
+  padding-top: 0;
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
-.course-header {
-  background: $color-bg-card; display: flex; padding: $spacing-lg;
-  border-bottom: 1rpx solid #F0F0F5;
-  &__color { width: 8rpx; border-radius: 4rpx; flex-shrink: 0; margin-right: $spacing-md; }
-  &__info { flex: 1; display: flex; flex-direction: column; gap: 8rpx; }
-  &__name { font-size: $font-size-2xl; font-weight: $font-weight-bold; color: $color-text-primary; }
-  &__sub { font-size: $font-size-sm; color: $color-text-secondary; }
-  &__stats { display: flex; flex-wrap: wrap; gap: $spacing-md; margin-top: $spacing-xs; }
-  &__stat { font-size: $font-size-sm; color: $color-text-secondary; }
+
+/* Nav */
+.cd-nav {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: calc(env(safe-area-inset-top) + 28rpx) 0 20rpx;
+  min-height: 88rpx; align-items: center;
+  position: relative; z-index: 10;
 }
-.tabs { display: flex; background: $color-bg-card; border-bottom: 1rpx solid #F0F0F5; }
-.tab {
-  flex: 1; height: 88rpx; display: flex; align-items: center; justify-content: center;
-  font-size: $font-size-sm; color: $color-text-secondary; position: relative;
-  &--active { color: $color-primary; font-weight: $font-weight-semibold;
-    &::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 4rpx; background: $color-primary; border-radius: 2rpx; }
-  }
+.cd-nav--hover { opacity: 0.6; }
+.cd-nav-back { font-size: 28rpx; color: #4F46E5; }
+.cd-nav-title { font-size: 32rpx; font-weight: 700; color: #1F2937; }
+
+/* Loading */
+.cd-nav-skel { width: 160rpx; height: 32rpx; background: #E5E7EB; border-radius: 8rpx; }
+.cd-hdr-skel { width: 100%; height: 280rpx; background: #E5E7EB; border-radius: 24rpx; margin-top: 16rpx; }
+.cd-tab-skel { width: 100%; height: 80rpx; background: #E5E7EB; border-radius: 16rpx; margin-top: 24rpx; }
+.cd-card-skel { width: 100%; height: 200rpx; background: #E5E7EB; border-radius: 24rpx; margin-top: 24rpx; }
+.cd-loading { padding: 32rpx; padding-top: calc(28rpx + env(safe-area-inset-top)); padding-bottom: 200rpx; min-height: 100vh; background: #F3F4F6; }
+
+/* Error */
+.cd-error { min-height: 100vh; background: #F3F4F6; padding: 32rpx; padding-top: calc(28rpx + env(safe-area-inset-top)); }
+.cd-error-bar { padding: 24rpx; background: #FEE2E2; border-radius: 16rpx; text-align: center; font-size: 28rpx; color: #DC2626; }
+
+/* Header Card */
+.cd-header {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
-.scroll { flex: 1; }
-.tab-content { padding: $spacing-lg; }
-.list { display: flex; flex-direction: column; gap: $spacing-md; }
-.review-card {
-  background: $color-bg-card; border-radius: $radius-2xl; padding: $spacing-lg;
-  &__title { font-size: $font-size-lg; font-weight: $font-weight-semibold; color: $color-text-primary; margin-bottom: $spacing-md; display: block; }
+.cd-header-top { display: flex; flex-direction: column; gap: 8rpx; }
+.cd-header-course { font-size: 40rpx; font-weight: 700; color: #1F2937; }
+.cd-header-instructor { font-size: 28rpx; color: #6B7280; }
+.cd-header-meta { font-size: 24rpx; color: #6B7280; }
+.cd-header-term { font-size: 24rpx; color: #9CA3AF; margin-top: 4rpx; }
+
+.cd-stats {
+  display: flex;
+  border-top: 2rpx solid #F3F4F6;
+  padding-top: 20rpx;
 }
-.review-task {
-  display: flex; align-items: center; gap: $spacing-sm; padding: $spacing-sm 0;
-  &__check { font-size: 36rpx; color: $color-primary; }
-  &__text { font-size: $font-size-md; color: $color-text-primary; &--done { color: $color-text-tertiary; text-decoration: line-through; } }
+.cd-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4rpx; }
+.cd-stat-num { font-size: 36rpx; font-weight: 700; color: #1F2937; }
+.cd-stat-num--green { color: #10B981; }
+.cd-stat-label { font-size: 24rpx; color: #9CA3AF; }
+
+/* Tabs */
+.cd-tabs {
+  display: flex;
+  margin-top: 24rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 8rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
-.review-weak { margin-top: $spacing-md; padding: $spacing-sm $spacing-md; background: #FEF3C7; border-radius: $radius-md; }
-.review-weak__label { font-size: $font-size-sm; color: $color-warning; }
+.cd-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 18rpx;
+  font-size: 28rpx;
+  color: #6B7280;
+  transition: all 0.2s;
+}
+.cd-tab--active {
+  background: #4F46E5;
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* Content */
+.cd-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-top: 24rpx;
+}
+
+/* Mistakes */
+.cd-mistake-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  width: 100%;
+  box-sizing: border-box;
+  &:active { opacity: 0.7; }
+}
+.cd-mistake-header { display: flex; justify-content: space-between; align-items: center; }
+.cd-mistake-topic { font-size: 24rpx; color: #4F46E5; font-weight: 600; }
+.cd-mistake-status { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 20rpx; background: #FEE2E2; color: #DC2626; }
+.cd-mistake-status--done { background: #D1FAE5; color: #059669; }
+.cd-mistake-question { font-size: 28rpx; color: #1F2937; line-height: 1.5; }
+.cd-mistake-tags { display: flex; flex-wrap: wrap; gap: 8rpx; }
+.cd-mistake-tag { font-size: 22rpx; color: #6B7280; background: #F3F4F6; padding: 4rpx 16rpx; border-radius: 20rpx; }
+
+/* Review */
+.cd-review-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.cd-review-title { font-size: 32rpx; font-weight: 700; color: #1F2937; }
+.cd-review-task { display: flex; align-items: center; gap: 16rpx; }
+.cd-review-check {
+  width: 40rpx; height: 40rpx;
+  border-radius: 8rpx;
+  border: 3rpx solid #D1D5DB;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.cd-review-check--done { background: #4F46E5; border-color: #4F46E5; }
+.cd-review-check-icon { font-size: 28rpx; color: #FFFFFF; }
+.cd-review-task-text { font-size: 28rpx; color: #1F2937; }
+.cd-review-task-text--done { color: #9CA3AF; text-decoration: line-through; }
+
+.cd-weakness-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.cd-weakness-title { font-size: 28rpx; font-weight: 600; color: #1F2937; }
+.cd-weakness-list { display: flex; flex-wrap: wrap; gap: 12rpx; }
+.cd-weakness-item {
+  font-size: 24rpx; color: #DC2626; background: #FEF2F2;
+  padding: 8rpx 20rpx; border-radius: 20rpx;
+}
+
+/* Modal */
+.cd-modal-mask {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: flex-end; justify-content: center;
+  z-index: 999;
+}
+.cd-modal {
+  width: 100%; max-width: 430px;
+  max-height: 70vh;
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  display: flex; flex-direction: column;
+  box-sizing: border-box;
+}
+.cd-modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 32rpx 32rpx 20rpx;
+  border-bottom: 2rpx solid #F3F4F6;
+}
+.cd-modal-title { font-size: 32rpx; font-weight: 700; color: #1F2937; }
+.cd-modal-close { font-size: 36rpx; color: #6B7280; padding: 8rpx; }
+.cd-modal-body { padding: 24rpx 32rpx 48rpx; max-height: 50vh; }
+.cd-modal-text { font-size: 28rpx; color: #374151; line-height: 1.8; white-space: pre-wrap; }
 </style>

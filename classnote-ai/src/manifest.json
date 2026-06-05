@@ -1,48 +1,49 @@
 {
-  "name": "ClassNote AI",
-  "appid": "__UNI__CLASSNOTE_AI",
-  "description": "把每一堂课，变成你的专属笔记",
-  "versionName": "0.1.0",
-  "versionCode": 100,
-  "transformPx": false,
-  "app-plus": {
-    "usingComponents": true,
-    "nvueStyleCompiler": "uni-app",
-    "compilerVersion": 3,
-    "splashscreen": {
-      "alwaysShowBeforeRender": true,
-      "waiting": true,
-      "autoclose": true,
-      "delay": 0
-    },
-    "modules": {},
-    "distribute": {
-      "android": {
-        "permissions": [
-          "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
-          "<uses-permission android:name=\"android.permission.BLUETOOTH\"/>",
-          "<uses-permission android:name=\"android.permission.BLUETOOTH_ADMIN\"/>",
-          "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
-          "<uses-permission android:name=\"android.permission.INTERNET\"/>",
-          "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>"
-        ]
-      },
-      "ios": {
-        "privacyDescription": {
-          "NSMicrophoneUsageDescription": "ClassNote AI 需要使用麦克风进行课堂录音",
-          "NSBluetoothAlwaysUsageDescription": "ClassNote AI 需要蓝牙连接降噪耳机",
-          "NSBluetoothPeripheralUsageDescription": "ClassNote AI 需要使用蓝牙外设"
+    "name" : "ClassNote AI",
+    "appid" : "__UNI__8B8BA9A",
+    "description" : "面向海外留学生的课堂AI笔记应用",
+    "versionName" : "0.1.0",
+    "versionCode" : 1,
+    "vueVersion" : "3",
+    "transformPx" : false,
+    "app-plus" : {
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
+        },
+        "modules" : {},
+        "distribute" : {
+            "android" : {
+                "permissions" : [
+                    "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
+                    "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>"
+                ]
+            },
+            "ios" : {
+                "dSYMs" : false
+            },
+            "sdkConfigs" : {}
         }
-      },
-      "sdkConfigs": {}
+    },
+    "quickapp" : {},
+    "mp-weixin" : {
+        "appid" : "",
+        "setting" : {
+            "urlCheck" : true
+        },
+        "usingComponents" : true
+    },
+    "h5" : {
+        "routerMode" : "hash",
+        "devServer" : {
+            "port" : 5173
+        },
+        "title" : "ClassNote AI"
     }
-  },
-  "quickapp": {},
-  "mp-weixin": {
-    "appid": "",
-    "setting": { "urlCheck": false },
-    "usingComponents": true
-  },
-  "uniStatistics": { "enable": false },
-  "vueVersion": "3"
 }

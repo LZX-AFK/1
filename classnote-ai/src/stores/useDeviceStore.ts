@@ -1,29 +1,57 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import type { DeviceState } from '@/types/index'
-
-const mockDevice: DeviceState = {
-  connected: true,
-  name: 'Newmax 耳机 Pro',
-  battery: 85,
-  ancEnabled: true,
-  noiseReductionEnabled: true,
-}
+import { ref, computed } from 'vue'
+import type { DeviceState } from '@/types'
 
 export const useDeviceStore = defineStore('device', () => {
-  const device = ref<DeviceState>(mockDevice)
+  // 设备状态（未连接时为空）
+  const state = ref<DeviceState>({
+    connected: false,
+    deviceName: '',
+    batteryLevel: 0,
+    ancEnabled: false,
+    signalStrength: 'poor',
+  })
 
-  function setConnected(connected: boolean) {
-    device.value.connected = connected
+  const isConnected = computed(() => state.value.connected)
+  const batteryDisplay = computed(() => `${state.value.batteryLevel}%`)
+
+  const pairedDevices = ref<Array<{ id: string; name: string; type: string; lastConnected: string }>>([])
+
+  // --- 方法 ---
+  function connect(deviceName: string) {
+    state.value = {
+      connected: true,
+      deviceName,
+      batteryLevel: 100,
+      ancEnabled: true,
+      signalStrength: 'good',
+    }
   }
 
-  function setBattery(level: number) {
-    device.value.battery = Math.max(0, Math.min(100, level))
+  function disconnect() {
+    state.value = {
+      ...state.value,
+      connected: false,
+      signalStrength: 'poor',
+    }
   }
 
   function toggleANC() {
-    device.value.ancEnabled = !device.value.ancEnabled
+    state.value.ancEnabled = !state.value.ancEnabled
   }
 
-  return { device, setConnected, setBattery, toggleANC }
+  function updateBattery(level: number) {
+    state.value.batteryLevel = Math.max(0, Math.min(100, level))
+  }
+
+  return {
+    state,
+    pairedDevices,
+    isConnected,
+    batteryDisplay,
+    connect,
+    disconnect,
+    toggleANC,
+    updateBattery,
+  }
 })

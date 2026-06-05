@@ -4,11 +4,19 @@ node_modules/
 dist/
 .cache/
 
+
 # uni-app build output
 unpackage/
 classnote-ai/dist/
 classnote-ai/node_modules/
-oleap-fastify-demo/node_modules/
+
+# Backend
+oleap-rail-clean/node_modules/
+oleap-rail-clean/.env
+oleap-rail-clean/*.db
+oleap-rail-clean/*.wav
+oleap-rail-clean/*.pcm
+oleap-rail-clean/*.pdf
 
 # IDE
 .vscode/
@@ -23,6 +31,7 @@ oleap-fastify-demo/node_modules/
 Thumbs.db
 
 # Env
+.env
 .env.local
 .env*.local
 
@@ -33,3 +42,21 @@ npm-debug.log*
 # Private / workspace files
 projects/
 conversations/
+
+# Test / temp files
+*.wav
+*.pcm
+*.webm
+*.ps1
+tts-text.txt
+classnote-ai/test.keystore
+classnote-ai/static/
+
+# Old backend (replaced by oleap-rail-clean)
+oleap-fastify-demo/
+
+# Other unrelated docs
+AI*.md
+模块*.md
+飞书*.png
+qpp*/

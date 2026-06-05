@@ -1,0 +1,47 @@
+{
+  "name": "ClassNote AI",
+  "appid": "__UNI__CLEARNOTE",
+  "description": "面向海外留学生的课堂AI笔记应用",
+  "versionName": "0.1.0",
+  "versionCode": 1,
+  "vueVersion": "3",
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "modules": {},
+    "distribute": {
+      "android": {
+        "permissions": [
+          "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
+          "<uses-permission android:name=\"android.permission.MODIFY_AUDIO_SETTINGS\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.INTERNET\"/>"
+        ]
+      },
+      "ios": {},
+      "sdkConfigs": {}
+    }
+  },
+  "quickapp": {},
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": true
+    },
+    "usingComponents": true
+  },
+  "h5": {
+    "routerMode": "hash",
+    "devServer": {
+      "port": 5173
+    },
+    "title": "ClassNote AI"
+  }
+}
