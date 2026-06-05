@@ -181,31 +181,37 @@ async function generateDialogue(foodName, calories, fatRatio, proteinRatio, carb
 
 // ========== 主入口 ==========
 exports.main = async (event, context) => {
-  const { food_name, calories = 0, fat_ratio = 0, protein_ratio = 0, carb_ratio = 0 } = event
+  const { foodName, food_name, category, calories = 0, fatRatio, fat_ratio, proteinRatio, protein_ratio, carbRatio, carb_ratio } = event
+
+  const name = foodName || food_name
+  const fat = fatRatio ?? fat_ratio ?? 0
+  const protein = proteinRatio ?? protein_ratio ?? 0
+  const carb = carbRatio ?? carb_ratio ?? 0
+  const skinName = name ? `${name}小人` : '食物小人'
 
   // 参数校验
-  if (!food_name || !food_name.trim()) {
-    return { code: -1, msg: '缺少 food_name 参数', data: null }
+  if (!name || !name.trim()) {
+    return { success: false, errorCode: 'INVALID_PARAMS', errorMessage: '缺少食物名称参数', data: null }
   }
 
   if (!DOUBAO_API_KEY) {
     console.error('[generateSkinAndDialogue] DOUBAO_API_KEY not configured')
-    // 无 API Key 时直接返回默认内容
     return {
-      code: 0,
-      msg:  '使用默认内容（豆包 API 未配置）',
+      success: true,
       data: {
-        skin_url: getDefaultSkin('default'),
+        skinUrl: getDefaultSkin(category || 'default'),
         dialogue: getDefaultDialogue(),
-        is_default: true,
+        skinName,
+        isDefaultSkin: true,
+        isDefaultDialogue: true,
       },
     }
   }
 
   // 并行请求：生图 + 生文同时进行
   const [skinResult, dialogueResult] = await Promise.allSettled([
-    generateImage(food_name),
-    generateDialogue(food_name, calories, fat_ratio, protein_ratio, carb_ratio),
+    generateImage(name),
+    generateDialogue(name, calories, fat, protein, carb),
   ])
 
   // 处理生图结果
@@ -219,7 +225,7 @@ exports.main = async (event, context) => {
     } else {
       // base64 数据 → 上传到云存储
       try {
-        const safeName = food_name.replace(/[^a-zA-Z0-9一-龥]/g, '_')
+        const safeName = name.replace(/[^a-zA-Z0-9一-龥]/g, '_')
         skinUrl = await uploadImageToCloud(imageData, safeName)
       } catch (uploadErr) {
         console.error('[generateSkin] Upload failed:', uploadErr.message)
@@ -247,13 +253,13 @@ exports.main = async (event, context) => {
   }
 
   return {
-    code: 0,
-    msg:  '生成完成',
+    success: true,
     data: {
-      skin_url:          skinUrl,
-      dialogue:          dialogue,
-      is_default_skin:   skinIsDefault,
-      is_default_dialogue: dialogueIsDefault,
+      skinUrl,
+      dialogue,
+      skinName,
+      isDefaultSkin: skinIsDefault,
+      isDefaultDialogue: dialogueIsDefault,
     },
   }
 }

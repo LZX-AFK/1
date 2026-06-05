@@ -81,20 +81,22 @@ exports.main = async (event, context) => {
       userData.weeklyActiveDates = thisWeekActiveDates
     }
 
-    const user = {
-      _id: userData._id,
-      nickname: userData.nickname,
-      avatarUrl: userData.avatarUrl || '',
-      leafTotal: userData.leafTotal || 0,
-      weeklyActiveDays: userData.weeklyActiveDays || 0,
-      weeklyActiveDates: userData.weeklyActiveDates || [],
-      streakDays: userData.streakDays || 0,
-      createdAt: userData.createdAt
-    }
-
     return {
       success: true,
-      data: { openid, isNewUser, user }
+      data: {
+        openid,
+        isNew: isNewUser,
+        leafTotal: userData.leafTotal || 0,
+        weeklyActiveDays: userData.weeklyActiveDays || 0,
+        weeklyActiveDates: userData.weeklyActiveDates || [],
+        user: {
+          _id: userData._id,
+          nickname: userData.nickname,
+          avatarUrl: userData.avatarUrl || '',
+          streakDays: userData.streakDays || 0,
+          createdAt: userData.createdAt
+        }
+      }
     }
   } catch (err) {
     console.error('登录失败:', err)

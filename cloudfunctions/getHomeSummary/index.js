@@ -24,11 +24,11 @@ exports.main = async (event, context) => {
       // 1. 用户资料
       db.collection('users').where({ openid }).get(),
       // 2. 今日 meals
-      db.collection('meals').where({ openid, recordDate: todayStr }).orderBy('createdAt', 'asc').get(),
+      db.collection('meals').where({ openid, record_date: todayStr }).orderBy('created_at', 'asc').get(),
       // 3. 小叶统计
       db.collection('leaf_unlocks').where({ openid }).count(),
       // 4. 最近一条 meal（用于底部面板）
-      db.collection('meals').where({ openid }).orderBy('createdAt', 'desc').limit(1).get(),
+      db.collection('meals').where({ openid }).orderBy('created_at', 'desc').limit(1).get(),
       // 5. 本周统计
       getWeeklyStats(openid, today)
     ])

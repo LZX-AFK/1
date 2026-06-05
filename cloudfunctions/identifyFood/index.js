@@ -183,9 +183,7 @@ exports.main = async (event, context) => {
         price: null,
         nutrition,
         category,
-        confidence,
-        // 百度原始数据保留（调试用）
-        _raw: dish
+        confidence
       }
     }
   } catch (err) {

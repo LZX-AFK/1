@@ -240,7 +240,9 @@ exports.main = async (event, context) => {
       skinUrl: skinUrl || null,
       skinName: skinName || null,
       dialogue: dialogue || null,
-      recordDate,
+      recordDate,       // camelCase 版本
+      record_date: recordDate,  // snake_case 兼容（C 的查询用这个字段）
+      food_name: foodName,      // snake_case 兼容（C 的查询用这个字段）
       createdAt: db.serverDate()
     }
 
