@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClassNote 后端测试面板</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;color:#1a1a2e;padding:20px}
+  .container{max-width:900px;margin:0 auto}
+  h1{font-size:24px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  h1 small{font-size:14px;color:#666;font-weight:normal}
+  .subtitle{color:#666;margin-bottom:20px;font-size:14px}
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600}
+  .badge.get{background:#dbeafe;color:#1d4ed8}
+  .badge.post{background:#d1fae5;color:#059669}
+  .badge.patch{background:#fef3c7;color:#d97706}
+  .grid{display:flex;flex-direction:column;gap:10px}
+  .card{background:white;border-radius:12px;padding:16px 20px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+  .card-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .card-header .path{font-family:monospace;font-size:13px;color:#333;flex:1}
+  .card-header .status{font-size:12px;padding:2px 8px;border-radius:10px}
+  .status.idle{background:#f3f4f6;color:#6b7280}
+  .status.success{background:#d1fae5;color:#059669}
+  .status.error{background:#fee2e2;color:#dc2626}
+  .status.loading{background:#dbeafe;color:#2563eb}
+  .btn{padding:6px 16px;border:none;border-radius:6px;font-size:13px;cursor:pointer;font-weight:500}
+  .btn-primary{background:#2563eb;color:white}
+  .btn-success{background:#059669;color:white}
+  .btn-warning{background:#d97706;color:white}
+  .btn-sm{padding:4px 12px;font-size:12px}
+  .card-body{display:none}
+  .card-body.open{display:block}
+  .card-body textarea,.card-body input{width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-family:monospace;font-size:13px;margin-bottom:8px}
+  .card-body textarea{min-height:60px;resize:vertical}
+  .card-body textarea.response{min-height:40px;background:#f8fafc;border-color:#e2e8f0;color:#334155}
+  .card-body textarea.response.success{border-color:#86efac}
+  .card-body textarea.response.error{border-color:#fca5a5}
+  .form-row{display:flex;gap:8px;margin-bottom:8px}
+  .form-row input{flex:1}
+  .section-title{font-size:16px;font-weight:600;margin:20px 0 10px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}
+  .sid-box{background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px;display:none}
+  .sid-box .lbl{font-weight:600;color:#92400e}
+  .sid-box .val{font-family:monospace;background:white;padding:2px 6px;border-radius:4px;color:#1a1a2e}
+  .flow{display:flex;align-items:center;gap:6px;margin:10px 0;padding:10px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0;font-size:13px;color:#166534}
+  .flow .dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+  .flow .dot.done{background:#22c55e;color:white}
+  .flow .dot.pending{background:#e5e7eb;color:#9ca3af}
+  .flow .dot.active{background:#3b82f6;color:white;animation:pulse 1s infinite}
+  .flow .arr{color:#9ca3af;font-size:14px}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>ClassNote 后端测试面板</h1>
+  <p class="subtitle">点按钮测试接口，响应会显示在下方文本框中</p>
+
+  <div class="sid-box" id="sidBox">
+    <span class="lbl">当前课堂ID：</span>
+    <span class="val" id="sidVal">-</span>
+  </div>
+
+  <div class="flow">
+    <span class="dot done" id="f1">1</span>
+    <span class="arr">→</span>
+    <span class="dot pending" id="f2">2</span>
+    <span class="arr">→</span>
+    <span class="dot pending" id="f3">3</span>
+    <span class="arr">→</span>
+    <span class="dot pending" id="f4">4</span>
+    <span style="margin-left:8px;flex:1">创建 → 标记 → 结束 → 查看总结</span>
+  </div>
+
+  <div class="card" style="border:2px solid #2563eb;background:#f0f6ff">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <strong>一键完整流程体验</strong>
+        <div style="font-size:12px;color:#666;margin-top:2px">自动完成：创建课堂 → 打标记 → 结束 → 查看总结</div>
+      </div>
+      <button class="btn btn-primary" onclick="runFullFlow(this)" id="flowBtn">一键体验完整闭环</button>
+    </div>
+  </div>
+
+  <div class="section-title">基础</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge get">GET</span>
+        <span class="path">/health</span>
+        <span class="status idle" id="s-health">未测试</span>
+        <button class="btn btn-primary btn-sm" onclick="testHealth(this)">测一下</button>
+      </div>
+    </div>
+    <div class="card" style="border:1px solid #7c3aed">
+      <div class="card-header">
+        <span class="badge ws">WS</span>
+        <span class="path">/ws/session/:id/audio</span>
+        <span class="status idle" id="s-ws">未测试</span>
+        <button class="btn btn-primary btn-sm" onclick="testWebSocketAudio(this)" style="background:#7c3aed">测试WebSocket音频</button>
+      </div>
+      <div class="card-body open">
+        <input id="i-ws-sid" placeholder="sessionId（不填则用当前课堂ID）">
+        <textarea class="response" id="r-ws" readonly rows="6" placeholder="点击按钮后，WebSocket 连接日志会显示在这里..."></textarea>
+        <div style="font-size:12px;color:#666;margin-top:4px">发送 440Hz 正弦波模拟音频（3秒），观察实时字幕返回</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">课堂会话</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge post">POST</span>
+        <span class="path">/api/sessions</span>
+        <span class="status idle" id="s-create">未测试</span>
+        <button class="btn btn-success btn-sm" onclick="testCreateSession(this)">创建课堂</button>
+      </div>
+      <div class="card-body open">
+        <div class="form-row">
+          <input id="i-title" value="物理课-牛顿定律" placeholder="课堂标题">
+          <input id="i-subject" value="Physics" placeholder="科目">
+        </div>
+        <textarea class="response" id="r-create" readonly placeholder="点击按钮后响应会显示在这里"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="badge get">GET</span>
+        <span class="path">/api/sessions</span>
+        <span class="status idle" id="s-list">未测试</span>
+        <button class="btn btn-primary btn-sm" onclick="testListSessions(this)">查列表</button>
+      </div>
+      <div class="card-body">
+        <textarea class="response" id="r-list" readonly placeholder="点击按钮后响应会显示在这里"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="badge get">GET</span>
+        <span class="path">/api/sessions/:id</span>
+        <span class="status idle" id="s-detail">未测试</span>
+        <button class="btn btn-primary btn-sm" onclick="testSessionDetail(this)">查详情</button>
+      </div>
+      <div class="card-body">
+        <input id="i-detail" placeholder="粘贴 sessionId">
+        <textarea class="response" id="r-detail" readonly placeholder="点击按钮后响应会显示在这里"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">标记系统</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge post">POST</span>
+        <span class="path">/api/sessions/:id/markers</span>
+        <span class="status idle" id="s-marker">未测试</span>
+        <button class="btn btn-success btn-sm" onclick="testAddMarker(this)">添加标记</button>
+      </div>
+      <div class="card-body open">
+        <div class="form-row">
+          <input id="i-marker-sid" placeholder="sessionId">
+          <input id="i-marker-ms" value="15000" placeholder="时间戳(ms)" style="width:100px">
+          <select id="i-marker-label" style="padding:6px;border:1px solid #d1d5db;border-radius:6px">
+            <option value="important">重要</option>
+            <option value="didnt_understand">没听懂</option>
+            <option value="question">疑问</option>
+          </select>
+        </div>
+        <input id="i-marker-note" value="牛顿第一定律核心概念" placeholder="备注(可选)">
+        <textarea class="response" id="r-marker" readonly placeholder="点击按钮后响应会显示在这里"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="badge get">GET</span>
+        <span class="path">/api/sessions/:id/markers</span>
+        <span class="status idle" id="s-mlist">未测试</span>
+        <button class="btn btn-primary btn-sm" onclick="testListMarkers(this)">查标记列表</button>
+      </div>
+      <div class="card-body">
+        <input id="i-mlist-sid" placeholder="sessionId">
+        <textarea class="response" id="r-mlist" readonly placeholder="点击按钮后响应会显示在这里"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">结束课堂 &amp; AI 总结</div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="badge patch">PATCH</span>
+        <span class="path">/api/sessions/:id/end</span>
+        <span class="status idle" id="s-end">未测试</span>
+        <button class="btn btn-warning btn-sm" onclick="testEndSession(this)">结束课堂</button>
+      </div>
+      <div class="card-body">
+        <input id="i-end" placeholder="sessionId">
+        <textarea class="response" id="r-end" readonly placeholder="点击按钮后响应会显示在这里"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="badge get">GET</span>
+        <span class="path">/api/sessions/:id/summary</span>
+        <span class="status idle" id="s-summary">未测试</span>
+        <button class="btn btn-primary btn-sm" onclick="testGetSummary(this)">看总结</button>
+      </div>
+      <div class="card-body">
+        <input id="i-summary" placeholder="sessionId">
+        <textarea class="response" id="r-summary" readonly placeholder="点击按钮后响应会显示在这里"></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="test-panel.js"></script>
+</body>
+</html>

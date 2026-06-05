@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id          String      @id @default(cuid())
+  userId      String      @default("demo-user")
+  title       String?
+  subject     String?
+  status      String      @default("recording") // recording/summarizing/done/failed
+  audioUrl    String?
+  durationMs  Int         @default(0)
+  startedAt   DateTime    @default(now())
+  endedAt     DateTime?
+  transcript  Transcript?
+  markers     Marker[]
+  summary     Summary?
+}
+
+model Transcript {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  fullText  String?
+  segments  String   @default("[]")   // 存储 { text, timestampMs } 数组，JSON 字符串
+  session   Session  @relation(fields: [sessionId], references: [id])
+}
+
+model Marker {
+  id          String   @id @default(cuid())
+  sessionId   String
+  timestampMs Int
+  label       String   // "didnt_understand", "important", "question"
+  note        String?
+  aiFollowUp  Boolean  @default(true)
+  session     Session  @relation(fields: [sessionId], references: [id])
+}
+
+model Summary {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  content   String   // AI 生成的 Markdown 笔记
+  keyPoints String   @default("[]")  // JSON 字符串
+  session   Session  @relation(fields: [sessionId], references: [id])
+}

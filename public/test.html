@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClassNote AI - 课堂笔记助手</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            padding: 24px 32px;
+        }
+        h1 { margin: 0 0 8px 0; font-size: 28px; color: #1a1a2e; }
+        h3 { margin: 16px 0 8px; color: #374151; font-size: 16px; }
+        .sub { color: #666; margin-bottom: 24px; border-left: 4px solid #667eea; padding-left: 12px; }
+        .status-bar {
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+            background: #f8f9ff; padding: 16px 20px; border-radius: 24px; margin-bottom: 24px;
+        }
+        .session-info {
+            font-family: monospace; font-size: 13px; background: #eef2ff;
+            padding: 6px 12px; border-radius: 40px;
+        }
+        button {
+            background: #4f46e5; border: none; color: white; padding: 10px 20px;
+            border-radius: 40px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 14px;
+        }
+        button:hover { background: #4338ca; transform: scale(0.98); }
+        button:disabled { background: #aaa; cursor: not-allowed; transform: none; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #6b7280; }
+        .btn-secondary:hover { background: #4b5563; }
+        .btn-green { background: #10b981; }
+        .btn-green:hover { background: #059669; }
+        .marker-buttons { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .marker-btn { background: #f3f4f6; color: #1f2937; border: 1px solid #d1d5db; }
+        .marker-btn.important { background: #fef3c7; border-color: #f59e0b; color: #b45309; }
+        .marker-btn.doubt { background: #fee2e2; border-color: #ef4444; color: #b91c1c; }
+        .marker-btn.question { background: #e0f2fe; border-color: #3b82f6; color: #1e40af; }
+        .transcript-box {
+            background: #1e1e2f; color: #e2e8f0; border-radius: 24px; padding: 20px;
+            height: 280px; overflow-y: auto; font-family: monospace;
+            font-size: 14px; line-height: 1.5; margin-bottom: 16px;
+        }
+        .transcript-line { margin-bottom: 8px; padding: 4px 8px; border-left: 3px solid #4f46e5; background: rgba(255,255,255,0.05); }
+        .summary-box {
+            background: #fef9e3; border: 1px solid #fde047; border-radius: 24px;
+            padding: 20px; margin-top: 16px; white-space: pre-wrap; font-size: 14px;
+        }
+        .marker-list { margin-bottom: 16px; font-size: 13px; color: #4b5563; }
+        .flex-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; background: #333; color: white;
+            padding: 10px 20px; border-radius: 40px; font-size: 14px;
+            z-index: 1000; opacity: 0.9;
+        }
+        .volume-indicator { display: inline-block; width: 30px; text-align: center; font-size: 18px; }
+
+        /* 历史课堂面板 */
+        .history-section {
+            margin-top: 32px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 24px;
+        }
+        .search-bar {
+            display: flex; gap: 10px; margin-bottom: 16px;
+        }
+        .search-bar input {
+            flex: 1; padding: 10px 16px; border: 1px solid #d1d5db;
+            border-radius: 40px; font-size: 14px; outline: none;
+        }
+        .search-bar input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+        .history-list { display: flex; flex-direction: column; gap: 10px; }
+        .history-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 20px; background: #f9fafb; border-radius: 16px;
+            border: 1px solid #e5e7eb; flex-wrap: wrap; gap: 8px;
+        }
+        .history-item:hover { background: #f3f4f6; }
+        .history-title { font-weight: 600; color: #1f2937; font-size: 15px; }
+        .history-meta { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+        .history-status {
+            font-size: 12px; padding: 3px 10px; border-radius: 40px; font-weight: 600;
+        }
+        .status-done { background: #d1fae5; color: #065f46; }
+        .status-recording { background: #fee2e2; color: #991b1b; }
+        .status-summarizing { background: #fef3c7; color: #92400e; }
+        .status-failed { background: #f3f4f6; color: #6b7280; }
+        .history-actions { display: flex; gap: 8px; }
+        .history-actions button { padding: 6px 14px; font-size: 12px; }
+        .empty-tip { text-align: center; color: #9ca3af; padding: 24px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>ClassNote AI 课堂助手</h1>
+    <div class="sub">实时语音转写 + 标记重点 + AI 生成专属笔记</div>
+
+    <!-- 控制栏 -->
+    <div class="status-bar">
+        <div>
+            <span>后端: <span id="backendUrl"></span></span>
+            <span id="sessionIdDisplay" class="session-info">未开始课堂</span>
+            <span id="volumeIcon" class="volume-indicator">🎤</span>
+        </div>
+        <div class="flex-row">
+            <button id="startBtn">开始课堂</button>
+            <button id="stopBtn" disabled>结束课堂</button>
+        </div>
+    </div>
+
+    <!-- 标记面板 -->
+    <div class="marker-buttons" id="markerPanel" style="display: none;">
+        <button class="marker-btn important" data-label="important">⭐ 重要知识点</button>
+        <button class="marker-btn doubt" data-label="didnt_understand">❓ 没听懂</button>
+        <button class="marker-btn question" data-label="question">📌 疑问/待复习</button>
+    </div>
+
+    <!-- 实时字幕 -->
+    <h3>实时字幕</h3>
+    <div id="transcriptArea" class="transcript-box">
+        <div style="color: #94a3b8;">等待课堂开始...</div>
+    </div>
+
+    <div id="markerInfo" class="marker-list">标记记录: 暂无</div>
+    <div id="summaryArea"></div>
+
+    <!-- 历史课堂 -->
+    <div class="history-section">
+        <div class="flex-row" style="justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="margin: 0;">历史课堂</h3>
+            <button class="btn-secondary" id="refreshHistoryBtn" style="padding:6px 16px;font-size:13px;">刷新</button>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="搜索课堂名称、科目或转写内容..." />
+            <button id="searchBtn">搜索</button>
+        </div>
+        <div class="history-list" id="historyList">
+            <div class="empty-tip">点击「刷新」加载历史课堂</div>
+        </div>
+    </div>
+</div>
+
+<script src="test-app.js?v=3"></script>
+</body>
+</html>
