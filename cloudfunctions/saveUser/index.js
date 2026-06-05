@@ -111,7 +111,7 @@ exports.main = async (event, context) => {
 
     return {
       success: true,
-      data: { isNew }
+      data: { isNew, calorieTarget }
     }
   } catch (err) {
     console.error('保存用户资料失败:', err)

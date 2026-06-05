@@ -51,8 +51,17 @@ exports.main = async (event, context) => {
   }
 
   try {
-    const meal = await db.collection('meals').doc(mealId).get()
-    if (!meal.data || meal.data.openid !== openid) {
+    const queryRes = await db.collection('meals').where({ mealId }).get()
+    if (queryRes.data.length === 0) {
+      return {
+        success: false,
+        errorCode: 'NOT_FOUND',
+        errorMessage: '记录不存在',
+        data: { updated: false }
+      }
+    }
+    const meal = queryRes.data[0]
+    if (meal.openid !== openid) {
       return {
         success: false,
         errorCode: 'FORBIDDEN',
@@ -61,8 +70,8 @@ exports.main = async (event, context) => {
       }
     }
 
-    safeUpdates.updated_at = db.serverDate()
-    await db.collection('meals').doc(mealId).update({ data: safeUpdates })
+    safeUpdates.updatedAt = db.serverDate()
+    await db.collection('meals').doc(meal._id).update({ data: safeUpdates })
 
     return {
       success: true,

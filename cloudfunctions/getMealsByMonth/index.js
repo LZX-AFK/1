@@ -40,7 +40,7 @@ exports.main = async (event, context) => {
       .collection('meals')
       .where({
         openid,
-        record_date: db.RegExp({ regexp: `^${datePrefix}`, options: 'i' })
+        record_date: db.command.RegExp({ regexp: `^${datePrefix}`, options: 'i' })
       })
       .orderBy('record_date', 'asc')
       .orderBy('created_at', 'asc')

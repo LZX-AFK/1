@@ -124,7 +124,7 @@ async function getWeeklyStats(openid, today) {
 
     const statsRes = await db.collection('user_daily_stats').where({
       openid,
-      date: db.in(weekDates)
+      date: db.command.in(weekDates)
     }).get()
 
     return {
