@@ -1,0 +1,7 @@
+{
+  "name": "login",
+  "version": "1.0.0",
+  "description": "微信登录 - openid 由上下文获取",
+  "main": "index.js",
+  "dependencies": { "wx-server-sdk": "~2.6.3" }
+}

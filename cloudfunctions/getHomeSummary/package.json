@@ -1,0 +1,9 @@
+{
+  "name": "getHomeSummary",
+  "version": "1.0.0",
+  "description": "首页聚合接口 - 用户+今日汇总+小叶+最新记录",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

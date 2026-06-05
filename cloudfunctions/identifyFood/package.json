@@ -1,0 +1,9 @@
+{
+  "name": "identifyFood",
+  "version": "1.0.0",
+  "description": "百度菜品识别 + 重试 + 降级",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "description": "饮食记录表 - B 建表，C 只读查询",
+  "collection_name": "meals",
+  "indexes": [
+    {
+      "name": "openid_recordDate_index",
+      "fields": ["openid", "recordDate"]
+    },
+    {
+      "name": "openid_createdAt_index",
+      "fields": ["openid", "createdAt"]
+    },
+    {
+      "name": "mealId_index",
+      "fields": ["mealId"],
+      "unique": true
+    }
+  ],
+  "sample_document": {
+    "mealId": "meal_1717500000000_abc123",
+    "openid": "oXXXXXX",
+    "foodName": "芝士汉堡",
+    "calories": 640,
+    "price": 32,
+    "category": "burger",
+    "mealType": "lunch",
+    "imageFileID": "cloud://xxx/meals/oXXX/1717500000.jpg",
+    "imageUrl": "https://xxx.tempFileURL",
+    "fatRatio": 38,
+    "proteinRatio": 27,
+    "carbRatio": 35,
+    "portion": "medium",
+    "skinUrl": "cloud://xxx/skins/burger_1717500000.png",
+    "skinName": "汉堡小人",
+    "dialogue": "嘿，我是小汉堡，偶尔吃一次也没事哦～",
+    "recordDate": "2026-06-05",
+    "createdAt": "2026-06-05T12:00:00.000Z"
+  },
+  "field_descriptions": {
+    "mealId": "唯一标识（meal_时间戳_随机串）",
+    "openid": "用户唯一标识",
+    "foodName": "食物名称（百度识别或用户手动输入）",
+    "calories": "热量 kcal（每份）",
+    "price": "价格 ¥（用户填写）",
+    "category": "食物大类（burger/staple/meat/seafood/...）",
+    "mealType": "餐次类型：breakfast/lunch/dinner/snack",
+    "imageFileID": "食物原图云存储 fileID",
+    "imageUrl": "食物原图临时 URL",
+    "fatRatio": "脂肪占比 %",
+    "proteinRatio": "蛋白质占比 %",
+    "carbRatio": "碳水占比 %",
+    "portion": "份量：small/medium/large",
+    "skinUrl": "食物角色皮肤图云存储 fileID",
+    "skinName": "角色名称（如：汉堡小人）",
+    "dialogue": "拟人对话文案",
+    "recordDate": "记录日期 YYYY-MM-DD（用于按日查询）",
+    "createdAt": "创建时间"
+  }
+}

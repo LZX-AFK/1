@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "triggers": [],
+  "environmentVariables": {
+    "DOUBAO_API_KEY": ""
+  }
+}

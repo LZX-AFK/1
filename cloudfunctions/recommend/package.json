@@ -1,0 +1,9 @@
+{
+  "name": "recommend",
+  "version": "1.0.0",
+  "description": "营养评分算法 + DeepSeek 文案润色推荐引擎",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "getSkins",
+  "version": "1.0.0",
+  "description": "食物衣柜 - 查询已解锁/未解锁列表",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}
