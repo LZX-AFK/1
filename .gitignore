@@ -12,3 +12,25 @@ miniprogram_npm/
 # 临时文件
 temp_*
 *.tmp
+
+# 测试文件和临时产物
+test_*.js
+test_*.py
+test_*.png
+checklist_output.txt
+conversations/
+java_textbook.pdf
+
+# C 的原始备份（已整合到 cloudfunctions/）
+c_cloudfunctions_backup/
+
+# 临时工具目录
+pdf-mcp/
+repo_temp/
+MinerU/
+mineru_output/
+test/
+
+# Node 临时文件
+package-lock.json
+package.json
